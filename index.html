@@ -6,128 +6,178 @@
   <title>考试系统 - 考试端</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; }
+    html, body { height: 100%; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; overflow: hidden; }
 
-    /* 登录页 */
+    /* ===================== 登录页 ===================== */
     .login-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      background: linear-gradient(135deg, #1a6b3c 0%, #2e9c57 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; background: linear-gradient(135deg, #1a6b3c 0%, #27ae60 100%);
     }
     .login-box {
-      background: white;
-      border-radius: 20px;
-      padding: 60px 50px;
-      width: 440px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      background: white; border-radius: 24px; padding: 60px 50px;
+      width: 460px; box-shadow: 0 24px 60px rgba(0,0,0,0.25);
     }
-    .login-box h1 { text-align: center; color: #1a6b3c; margin-bottom: 40px; font-size: 36px; }
-    .form-group { margin-bottom: 24px; }
+    .login-box h1 { text-align: center; color: #1a6b3c; margin-bottom: 12px; font-size: 38px; }
+    .login-box p { text-align: center; color: #888; margin-bottom: 40px; font-size: 16px; }
+    .form-group { margin-bottom: 28px; }
     .form-group label { display: block; margin-bottom: 10px; color: #1a6b3c; font-weight: 600; font-size: 18px; }
     .form-group input {
-      width: 100%; padding: 18px; border: 2px solid #c8e6c9; border-radius: 12px;
-      font-size: 20px; outline: none; transition: border-color 0.3s; font-family: inherit;
+      width: 100%; padding: 18px 20px; border: 2px solid #c8e6c9; border-radius: 14px;
+      font-size: 22px; outline: none; transition: border-color 0.3s; font-family: inherit;
     }
     .form-group input:focus { border-color: #1a6b3c; }
     .btn-login {
       width: 100%; padding: 20px; background: #1a6b3c; color: white;
-      border: none; border-radius: 12px; font-size: 22px; font-weight: bold;
-      cursor: pointer; transition: all 0.3s; margin-top: 10px;
+      border: none; border-radius: 14px; font-size: 22px; font-weight: bold;
+      cursor: pointer; transition: all 0.3s; font-family: inherit;
     }
-    .btn-login:hover { background: #145a30; transform: translateY(-2px); }
+    .btn-login:hover { background: #145a30; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,107,60,0.35); }
 
-    /* 考试页 */
-    .exam-screen { display: none; min-height: 100vh; background: #f5f7fa; }
-    .exam-header {
-      background: #1a6b3c; color: white; padding: 16px 30px;
-      display: flex; justify-content: space-between; align-items: center;
-      position: sticky; top: 0; z-index: 10;
+    /* ===================== 考试页 ===================== */
+    .exam-screen { display: none; height: 100vh; flex-direction: column; background: #f0f2f5; }
+
+    /* 顶部导航 */
+    .top-bar {
+      background: #1a6b3c; color: white; padding: 14px 28px;
+      display: flex; align-items: center; gap: 16px; flex-shrink: 0;
     }
-    .exam-header h2 { font-size: 22px; }
-    .exam-header-right { display: flex; gap: 12px; align-items: center; }
-    .student-info { font-size: 16px; opacity: 0.9; }
-    .btn-fullscreen {
-      padding: 8px 16px; background: rgba(255,255,255,0.2); color: white;
-      border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; cursor: pointer; font-size: 14px;
+    .top-bar h2 { font-size: 20px; }
+    .top-bar .spacer { flex: 1; }
+    .top-bar .student-name { font-size: 15px; opacity: 0.85; }
+    .top-bar button {
+      padding: 7px 18px; background: rgba(255,255,255,0.15); color: white;
+      border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
+      cursor: pointer; font-size: 14px; font-family: inherit; transition: background 0.2s;
     }
-    .btn-fullscreen:hover { background: rgba(255,255,255,0.3); }
-    .btn-end { padding: 8px 16px; background: #c0392b; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
-    .btn-end:hover { background: #a93226; }
+    .top-bar button:hover { background: rgba(255,255,255,0.25); }
+    .btn-end-exam { background: #c0392b !important; border-color: #c0392b !important; }
+    .btn-end-exam:hover { background: #a93226 !important; border-color: #a93226 !important; }
 
-    .progress-bar { background: #e8f5e9; height: 6px; }
-    .progress-fill { height: 100%; background: #1a6b3c; transition: width 0.3s; }
+    /* 进度条 */
+    .progress-bar { height: 4px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+    .progress-fill { height: 100%; background: #a8e6cf; transition: width 0.4s; }
 
-    .exam-body { padding: 30px; max-width: 1000px; margin: 0 auto; }
-    .exam-title { font-size: 28px; color: #1a6b3c; margin-bottom: 30px; text-align: center; }
-
-    .category-card {
-      background: white; border-radius: 16px; margin-bottom: 24px; overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      opacity: 0.4; filter: blur(4px); transition: all 0.3s;
+    /* 主体幻灯片区 */
+    .slide-wrapper {
+      flex: 1; overflow: hidden; position: relative;
     }
-    .category-card.current { opacity: 1; filter: none; box-shadow: 0 8px 32px rgba(26,107,60,0.15); }
-    .category-card.completed { opacity: 0.6; filter: none; }
-    .category-header { padding: 24px 30px; color: white; display: flex; align-items: center; gap: 16px; }
-    .category-header.gushi { background: linear-gradient(135deg, #1a6b3c, #2e9c57); }
-    .category-header.wenyi { background: linear-gradient(135deg, #1565c0, #1e88e5); }
-    .category-header.xinwen { background: linear-gradient(135deg, #e65100, #f57c00); }
-    .category-header.jixing { background: linear-gradient(135deg, #6a1b9a, #8e24aa); }
-    .category-icon { font-size: 32px; }
-    .category-name { font-size: 24px; font-weight: bold; }
-    .category-status { margin-left: auto; padding: 6px 16px; background: rgba(255,255,255,0.2); border-radius: 20px; font-size: 14px; }
-    .category-content { padding: 30px; font-size: 20px; line-height: 1.8; color: #333; white-space: pre-wrap; }
 
-    .exam-footer {
-      position: fixed; bottom: 0; left: 0; right: 0; background: white;
-      padding: 20px 30px; display: flex; justify-content: center; gap: 20px;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+    /* 单个幻灯片页面 */
+    .slide {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; flex-direction: column;
+      background: white;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.35s ease;
     }
-    .btn-next, .btn-prev { padding: 16px 48px; border: none; border-radius: 12px; font-size: 20px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
-    .btn-next { background: #1a6b3c; color: white; }
-    .btn-next:hover { background: #145a30; }
-    .btn-prev { background: #e0e0e0; color: #666; }
-    .btn-prev:hover { background: #d0d0d0; }
-    .btn-next:disabled, .btn-prev:disabled { opacity: 0.4; cursor: not-allowed; }
+    .slide.active {
+      opacity: 1; pointer-events: auto;
+    }
 
+    /* 幻灯片页头 */
+    .slide-header {
+      padding: 24px 40px; display: flex; align-items: center; gap: 16px;
+      flex-shrink: 0;
+    }
+    .slide-header .slide-icon { font-size: 28px; }
+    .slide-header .slide-name { font-size: 20px; font-weight: 700; color: white; }
+    .slide-header .slide-badge {
+      margin-left: auto; padding: 6px 18px; border-radius: 20px;
+      background: rgba(255,255,255,0.25); color: white; font-size: 13px;
+    }
+    .slide-header.gushi { background: linear-gradient(135deg, #1a6b3c, #27ae60); }
+    .slide-header.wenyi { background: linear-gradient(135deg, #1565c0, #1e88e5); }
+    .slide-header.xinwen { background: linear-gradient(135deg, #e65100, #fb8c00); }
+    .slide-header.jixing { background: linear-gradient(135deg, #6a1b9a, #8e24aa); }
+
+    /* 题目内容区 */
+    .slide-content {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 40px 60px; overflow: hidden;
+    }
+    .slide-content .question-text {
+      font-size: clamp(20px, 3.5vw, 36px);
+      line-height: 2; color: #222; text-align: center;
+      max-width: 900px; white-space: pre-wrap; word-break: break-all;
+      letter-spacing: 0.5px;
+    }
+
+    /* 底部导航栏 */
+    .nav-bar {
+      background: white; padding: 20px 40px;
+      display: flex; align-items: center; justify-content: center; gap: 24px;
+      flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+    }
+    .nav-btn {
+      padding: 16px 56px; border: none; border-radius: 14px;
+      font-size: 20px; font-weight: bold; cursor: pointer;
+      transition: all 0.25s; font-family: inherit;
+    }
+    .nav-btn.prev { background: #e8e8e8; color: #666; }
+    .nav-btn.prev:hover { background: #d4d4d4; }
+    .nav-btn.next { background: #1a6b3c; color: white; }
+    .nav-btn.next:hover { background: #145a30; transform: translateX(4px); }
+    .nav-btn.finish {
+      background: linear-gradient(135deg, #c0392b, #e74c3c); color: white;
+    }
+    .nav-btn.finish:hover { background: linear-gradient(135deg, #a93226, #c0392b); }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; }
+
+    /* 页码指示器 */
+    .page-dots {
+      display: flex; gap: 8px; align-items: center;
+    }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #ccc; transition: all 0.3s;
+    }
+    .dot.active { background: #1a6b3c; width: 28px; border-radius: 5px; }
+    .dot.done { background: #a8e6cf; }
+
+    /* ===================== 加载中 ===================== */
+    .loading-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.96); display: flex;
+      align-items: center; justify-content: center; z-index: 300;
+      flex-direction: column; gap: 20px;
+    }
+    .spinner {
+      width: 52px; height: 52px; border: 5px solid #e8f5e9;
+      border-top-color: #1a6b3c; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-size: 20px; color: #1a6b3c; font-weight: 600; }
+
+    /* ===================== 结束确认弹窗 ===================== */
+    .confirm-modal {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.55); display: flex;
+      align-items: center; justify-content: center; z-index: 400;
+    }
+    .confirm-box {
+      background: white; border-radius: 24px; padding: 48px 40px;
+      width: 420px; text-align: center;
+    }
+    .confirm-box h3 { font-size: 26px; color: #333; margin-bottom: 14px; }
+    .confirm-box p { color: #888; margin-bottom: 36px; font-size: 16px; line-height: 1.6; }
+    .confirm-btns { display: flex; gap: 16px; }
+    .confirm-btns button { flex: 1; padding: 18px; border-radius: 14px; font-size: 18px; border: none; cursor: pointer; font-family: inherit; font-weight: 600; }
+    .btn-cancel { background: #f0f0f0; color: #666; }
+    .btn-cancel:hover { background: #e0e0e0; }
+    .btn-confirm-end { background: #c0392b; color: white; }
+    .btn-confirm-end:hover { background: #a93226; }
+
+    /* Toast */
     .toast {
-      position: fixed; top: 80px; right: 30px; padding: 16px 24px;
-      color: white; border-radius: 10px; font-size: 16px; z-index: 1000;
+      position: fixed; top: 80px; right: 30px; padding: 16px 28px;
+      color: white; border-radius: 12px; font-size: 16px; z-index: 500;
       animation: slideIn 0.3s;
     }
     .toast-ok { background: #27ae60; }
     .toast-err { background: #e74c3c; }
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-    .loading-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.95); display: flex;
-      align-items: center; justify-content: center; z-index: 100; flex-direction: column; gap: 20px;
-    }
-    .spinner {
-      width: 48px; height: 48px; border: 4px solid #e8f5e9;
-      border-top-color: #1a6b3c; border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 20px; color: #1a6b3c; }
-
-    .confirm-modal {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6); display: flex;
-      align-items: center; justify-content: center; z-index: 200;
-    }
-    .confirm-box { background: white; border-radius: 20px; padding: 40px; width: 420px; text-align: center; }
-    .confirm-box h3 { font-size: 24px; color: #333; margin-bottom: 16px; }
-    .confirm-box p { color: #666; margin-bottom: 30px; font-size: 16px; }
-    .confirm-btns { display: flex; gap: 16px; }
-    .confirm-btns button { flex: 1; padding: 16px; border-radius: 12px; font-size: 18px; border: none; cursor: pointer; }
-    .btn-cancel { background: #e0e0e0; color: #666; }
-    .btn-confirm-end { background: #1a6b3c; color: white; }
-
-    .page-body { padding-bottom: 100px; }
   </style>
 </head>
 <body>
@@ -135,7 +185,8 @@
   <!-- 登录页 -->
   <div class="login-screen" id="loginScreen">
     <div class="login-box">
-      <h1>考试系统</h1>
+      <h1>🎓 考试系统</h1>
+      <p>请输入您的姓名开始考试</p>
       <div class="form-group">
         <label>学员姓名</label>
         <input type="text" id="studentNameInput" placeholder="请输入学员姓名" autocomplete="off">
@@ -146,22 +197,25 @@
 
   <!-- 考试页 -->
   <div class="exam-screen" id="examScreen">
-    <div class="exam-header">
-      <h2>考试答题</h2>
-      <div class="exam-header-right">
-        <span class="student-info" id="studentDisplay"></span>
-        <button class="btn-fullscreen" id="fsBtn" onclick="toggleFullscreen()">全屏</button>
-        <button class="btn-end" onclick="showEndConfirm()">结束考试</button>
-      </div>
+    <!-- 顶部栏 -->
+    <div class="top-bar">
+      <h2>🎓 考试答题</h2>
+      <span class="spacer"></span>
+      <span class="student-name" id="studentDisplay"></span>
+      <button onclick="toggleFullscreen()" id="fsBtn">全屏</button>
+      <button class="btn-end-exam" onclick="showEndConfirm()">结束考试</button>
     </div>
+    <!-- 进度条 -->
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <div class="exam-body page-body">
-      <div class="exam-title" id="examTitle">正在加载...</div>
-      <div id="categoryList"></div>
-    </div>
-    <div class="exam-footer">
-      <button class="btn-prev" id="btnPrev" onclick="prevCategory()">上一题</button>
-      <button class="btn-next" id="btnNext" onclick="nextCategory()">下一题</button>
+
+    <!-- 幻灯片区域 -->
+    <div class="slide-wrapper" id="slideWrapper"></div>
+
+    <!-- 底部导航 -->
+    <div class="nav-bar">
+      <button class="nav-btn prev" id="btnPrev" onclick="prevSlide()">← 上一题</button>
+      <div class="page-dots" id="pageDots"></div>
+      <button class="nav-btn next" id="btnNext" onclick="nextSlide()">下一题 →</button>
     </div>
 
     <!-- 加载中 -->
@@ -175,7 +229,7 @@
       <div class="confirm-box">
         <h3>确认结束考试？</h3>
         <p>结束考试后将返回登录界面</p>
-        <div class="confirm-btns">
+        <div class="browse">
           <button class="btn-cancel" onclick="hideEndConfirm()">取消</button>
           <button class="btn-confirm-end" onclick="endExam()">确认结束</button>
         </div>
@@ -199,7 +253,7 @@ const categories = [
   { key: '即兴评述', icon: '💡', cls: 'jixing' }
 ];
 
-// ===== REST API 工具函数 =====
+// ===== REST API =====
 function api(path, options = {}) {
   const url = SUPABASE_URL + '/rest/v1/' + path;
   const headers = {
@@ -220,6 +274,7 @@ function toast(msg, ok) {
   setTimeout(() => el.remove(), 3000);
 }
 
+// ===== 加载状态 =====
 function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
 function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
 
@@ -232,28 +287,17 @@ async function doExamLogin() {
   document.getElementById('loginBtn').disabled = true;
 
   try {
-    // 1. 按姓名查找学员
     const students = await api('students?name=eq.' + encodeURIComponent(name) + '&select=*&limit=1');
     const data = Array.isArray(students) ? students[0] : null;
-
-    if (!data) {
-      toast('未找到该学员，请确认姓名是否正确', false);
-      return;
-    }
+    if (!data) { toast('未找到该学员，请确认姓名', false); return; }
     currentStudent = data;
 
-    // 2. 查询该学员的套题（关联 questions 表）
     const examSets = await api(
       'exam_sets?student_id=eq.' + data.id +
-      '&select=category,question_id,questions(content)'
+      '&select=category,questions(content)'
     );
+    if (!examSets || examSets.length === 0) { toast('该学员暂未分配套题，请联系管理员', false); return; }
 
-    if (!examSets || examSets.length === 0) {
-      toast('该学员暂未分配套题，请联系管理员', false);
-      return;
-    }
-
-    // 3. 按四个类别组装数据
     examData = categories.map(cat => {
       const item = examSets.find(e => e.category === cat.key);
       return {
@@ -264,78 +308,114 @@ async function doExamLogin() {
 
     currentIndex = 0;
 
-    // 4. 切换到考试页面
     document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('examScreen').style.display = 'block';
+    document.getElementById('examScreen').style.display = 'flex';
     document.getElementById('studentDisplay').textContent = '学员：' + data.name;
 
-    renderCategories();
-    updateProgress();
+    renderSlides();
+    updateNav();
 
   } catch (err) {
     console.error(err);
-    toast('网络错误，请检查网络连接后重试', false);
+    toast('网络错误，请检查网络后重试', false);
   } finally {
     hideLoading();
     document.getElementById('loginBtn').disabled = false;
   }
 }
 
-// ===== 渲染题目 =====
-function renderCategories() {
-  const titleText = examData.length > 0
-    ? currentStudent.name + ' 的考试题目（第 ' + (currentIndex + 1) + ' / ' + examData.length + ' 题）'
-    : '暂无题目';
-  document.getElementById('examTitle').textContent = titleText;
+// ===== 渲染全部幻灯片 =====
+function renderSlides() {
+  const wrapper = document.getElementById('slideWrapper');
+  const dots = document.getElementById('pageDots');
 
-  document.getElementById('categoryList').innerHTML = examData.map((item, i) => {
-    let cls = '';
-    let statusText = '';
-    if (i < currentIndex) { cls = 'completed'; statusText = '已完成'; }
-    else if (i === currentIndex) { cls = 'current'; statusText = '当前'; }
-    return '<div class="category-card ' + cls + '">' +
-      '<div class="category-header ' + item.cls + '">' +
-        '<span class="category-icon">' + item.icon + '</span>' +
-        '<span class="category-name">' + item.key + '</span>' +
-        '<span class="category-status">' + statusText + '</span>' +
+  // 生成幻灯片 DOM
+  wrapper.innerHTML = examData.map((item, i) => {
+    const statusText = i < currentIndex ? '已完成' : (i === currentIndex ? '当前' : '');
+    return '<div class="slide' + (i === currentIndex ? ' active' : '') + '" id="slide-' + i + '">' +
+      '<div class="slide-header ' + item.cls + '">' +
+        '<span class="slide-icon">' + item.icon + '</span>' +
+        '<span class="slide-name">' + item.key + '</span>' +
+        '<span class="slide-badge">' + statusText + '</span>' +
       '</div>' +
-      '<div class="category-content">' + item.content + '</div>' +
+      '<div class="slide-content">' +
+        '<div class="question-text">' + escapeHtml(item.content) + '</div>' +
+      '</div>' +
     '</div>';
   }).join('');
 
-  document.getElementById('btnPrev').disabled = currentIndex === 0;
-  document.getElementById('btnNext').disabled = currentIndex === examData.length - 1;
+  // 生成指示点
+  dots.innerHTML = examData.map((_, i) =>
+    '<div class="dot' + (i === currentIndex ? ' active' : (i < currentIndex ? ' done' : '')) + '"></div>'
+  ).join('');
 }
 
-function updateProgress() {
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// ===== 导航逻辑 =====
+function goToSlide(idx) {
+  if (idx < 0 || idx >= examData.length) return;
+  const prev = document.getElementById('slide-' + currentIndex);
+  const next = document.getElementById('slide-' + idx);
+  if (prev) prev.classList.remove('active');
+  if (next) next.classList.add('active');
+
+  // 更新头部 badge
+  document.querySelectorAll('.slide').forEach((s, i) => {
+    const badge = s.querySelector('.slide-badge');
+    if (!badge) return;
+    badge.textContent = i < idx ? '已完成' : (i === idx ? '当前' : '');
+  });
+
+  currentIndex = idx;
+  updateNav();
+}
+
+function nextSlide() {
+  goToSlide(currentIndex + 1);
+}
+
+function prevSlide() {
+  goToSlide(currentIndex - 1);
+}
+
+// 更新导航按钮 & 进度条 & 指示点
+function updateNav() {
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const isFirst = currentIndex === 0;
+  const isLast = currentIndex === examData.length - 1;
+
+  btnPrev.disabled = isFirst;
+  btnNext.disabled = isLast;
+
+  // 最后一题把"下一题"改成"完成"
+  if (isLast) {
+    btnNext.textContent = '✅ 完成';
+    btnNext.classList.add('finish');
+    btnNext.classList.remove('next');
+    btnNext.onclick = function() { showEndConfirm(); };
+  } else {
+    btnNext.textContent = '下一题 →';
+    btnNext.classList.remove('finish');
+    btnNext.classList.add('next');
+    btnNext.onclick = nextSlide;
+  }
+
+  // 进度条
   const pct = examData.length > 0 ? ((currentIndex + 1) / examData.length) * 100 : 0;
   document.getElementById('progressFill').style.width = pct + '%';
-}
 
-// ===== 翻页 =====
-function nextCategory() {
-  if (currentIndex < examData.length - 1) {
-    currentIndex++;
-    renderCategories();
-    updateProgress();
-    scrollToCurrent();
-  }
-}
-
-function prevCategory() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    renderCategories();
-    updateProgress();
-    scrollToCurrent();
-  }
-}
-
-function scrollToCurrent() {
-  const cards = document.querySelectorAll('.category-card');
-  if (cards[currentIndex]) {
-    cards[currentIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
+  // 指示点
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.className = 'dot' + (i === currentIndex ? ' active' : (i < currentIndex ? ' done' : ''));
+  });
 }
 
 // ===== 结束考试 =====
@@ -344,25 +424,24 @@ function hideEndConfirm() { document.getElementById('confirmModal').style.displa
 
 function endExam() {
   hideEndConfirm();
+  if (document.fullscreenElement) document.exitFullscreen();
   currentStudent = null;
   currentIndex = 0;
   examData = [];
   document.getElementById('examScreen').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('studentNameInput').value = '';
-  if (document.fullscreenElement) document.exitFullscreen();
   toast('考试已结束');
 }
 
 // ===== 全屏 =====
 function toggleFullscreen() {
   if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(() => toast('全屏模式不可用', false));
+    document.documentElement.requestFullscreen().catch(() => toast('全屏不可用', false));
   } else {
     document.exitFullscreen();
   }
 }
-
 document.addEventListener('fullscreenchange', () => {
   const btn = document.getElementById('fsBtn');
   if (btn) btn.textContent = document.fullscreenElement ? '退出全屏' : '全屏';
@@ -371,6 +450,14 @@ document.addEventListener('fullscreenchange', () => {
 // 回车登录
 document.getElementById('studentNameInput').addEventListener('keypress', e => {
   if (e.key === 'Enter') doExamLogin();
+});
+
+// 键盘翻页
+document.addEventListener('keydown', e => {
+  if (document.getElementById('examScreen').style.display === 'none') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); prevSlide(); }
+  if (e.key === 'Escape') { hideEndConfirm(); }
 });
 </script>
 </body>
