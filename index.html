@@ -102,6 +102,10 @@
       max-width: 900px; white-space: pre-wrap; word-break: break-all;
       letter-spacing: 0.5px;
     }
+    /* 文艺稿件、新闻播报、即兴评述左对齐 */
+    .slide-content .question-text.align-left {
+      text-align: left;
+    }
 
     /* 底部导航栏 */
     .nav-bar {
@@ -332,6 +336,8 @@ function renderSlides() {
   // 生成幻灯片 DOM
   wrapper.innerHTML = examData.map((item, i) => {
     const statusText = i < currentIndex ? '已完成' : (i === currentIndex ? '当前' : '');
+    // 古诗词居中，其他左对齐
+    const alignClass = (item.cls === 'gushi') ? '' : ' align-left';
     return '<div class="slide' + (i === currentIndex ? ' active' : '') + '" id="slide-' + i + '">' +
       '<div class="slide-header ' + item.cls + '">' +
         '<span class="slide-icon">' + item.icon + '</span>' +
@@ -339,7 +345,7 @@ function renderSlides() {
         '<span class="slide-badge">' + statusText + '</span>' +
       '</div>' +
       '<div class="slide-content">' +
-        '<div class="question-text">' + escapeHtml(item.content) + '</div>' +
+        '<div class="question-text' + alignClass + '">' + escapeHtml(item.content) + '</div>' +
       '</div>' +
     '</div>';
   }).join('');
