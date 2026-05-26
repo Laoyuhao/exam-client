@@ -1,0 +1,848 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考试系统 - 管理员端</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #e8f5e9 0%, #c8e6c9 40%, #a5d6a7 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+.bg-circle {
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.circle-1 { width: 500px; height: 500px; background: #4caf50; top: -200px; right: -150px; }
+.circle-2 { width: 350px; height: 350px; background: #ffd54f; bottom: 300px; left: -120px; }
+.circle-3 { width: 250px; height: 250px; background: #81c784; bottom: -80px; right: 150px; }
+
+/* ===== 登录页 ===== */
+.login-container {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 100vh; padding: 20px; position: relative; z-index: 10;
+}
+
+.login-card {
+  width: 420px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 32px; padding: 48px 40px;
+  box-shadow: 0 20px 80px rgba(76, 175, 80, 0.2), 0 4px 16px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(30px);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+.login-icon-area { text-align: center; margin-bottom: 36px; }
+
+.icon-circle {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, #4caf50 0%, #81c784 100%);
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 12px 40px rgba(76, 175, 80, 0.4);
+}
+
+.icon-emoji { font-size: 40px; }
+
+.login-title {
+  display: block; font-size: 32px; font-weight: 700;
+  color: #1b5e20; letter-spacing: 4px; margin-bottom: 8px;
+}
+
+.login-subtitle {
+  display: block; font-size: 16px; color: #66bb6a; letter-spacing: 2px;
+}
+
+.input-group { margin-bottom: 24px; }
+
+.input-label {
+  display: block; font-size: 14px; font-weight: 600;
+  color: #2e7d32; margin-bottom: 8px;
+}
+
+.input-wrapper {
+  display: flex; align-items: center;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 16px; padding: 12px 20px;
+  border: 2px solid #c8e6c9; transition: all 0.3s;
+}
+
+.input-wrapper:focus-within {
+  border-color: #4caf50;
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+}
+
+.input-icon { font-size: 20px; opacity: 0.6; margin-right: 12px; flex-shrink: 0; }
+
+.input-field {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-size: 16px; color: #1b5e20; padding: 4px 0;
+}
+
+.input-field::placeholder { color: #a5d6a7; }
+
+.btn-login {
+  width: 100%; height: 52px;
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+  border: none; border-radius: 16px;
+  color: #ffffff; font-size: 18px; font-weight: 700; letter-spacing: 8px;
+  cursor: pointer;
+  box-shadow: 0 10px 40px rgba(76, 175, 80, 0.35);
+  transition: all 0.3s; margin-top: 8px;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 48px rgba(76, 175, 80, 0.45);
+}
+
+/* ===== 主界面 ===== */
+.main-container {
+  max-width: 1200px; margin: 0 auto; padding: 32px; position: relative; z-index: 10;
+}
+
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px; padding: 20px 28px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.15);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+.title-wrapper { display: flex; align-items: center; gap: 16px; }
+
+.top-icon { font-size: 40px; }
+
+.top-title {
+  font-size: 32px; font-weight: 700; color: #1b5e20; letter-spacing: 3px;
+}
+
+.top-subtitle { font-size: 14px; color: #4caf50; font-weight: 500; margin-top: 4px; }
+
+.btn-logout {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+  color: #fff; border: none; border-radius: 12px;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(244, 67, 54, 0.3);
+  transition: all 0.3s;
+}
+
+.btn-logout:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(244, 67, 54, 0.4); }
+
+/* 标签页 */
+.tabs-pill {
+  display: flex; background: rgba(76, 175, 80, 0.08);
+  border-radius: 16px; padding: 6px; margin-bottom: 32px; gap: 6px;
+}
+
+.tab-pill {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 16px 0; border-radius: 12px;
+  font-size: 16px; font-weight: 500; color: #66bb6a;
+  cursor: pointer; transition: all 0.35s ease;
+  border: none; background: transparent;
+}
+
+.tab-pill.active {
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+  color: #ffffff; box-shadow: 0 6px 24px rgba(76, 175, 80, 0.4); font-weight: 600;
+}
+
+/* 统计卡片 */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 36px; }
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.9); border-radius: 20px;
+  padding: 24px 16px; text-align: center;
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+}
+
+.stat-number {
+  display: block; font-size: 48px; font-weight: 700; color: #2e7d32; line-height: 1.2;
+}
+
+.stat-label { font-size: 14px; color: #4caf50; font-weight: 500; margin-top: 8px; }
+
+/* 区块卡片 */
+.section-card {
+  background: rgba(255, 255, 255, 0.9); border-radius: 24px;
+  padding: 32px; margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(15px);
+}
+
+.danger-card { background: rgba(255, 243, 224, 0.95); border: 2px solid #ffcc80; }
+
+.section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+
+.section-icon { font-size: 28px; }
+
+.section-title {
+  font-size: 24px; font-weight: 700; color: #1b5e20; letter-spacing: 2px;
+}
+
+/* 表单 */
+.form-group { margin-bottom: 20px; }
+
+.form-label {
+  display: block; font-size: 14px; font-weight: 600; color: #2e7d32; margin-bottom: 8px;
+}
+
+.form-select {
+  width: 100%; padding: 14px 20px;
+  border: 2px solid #c8e6c9; border-radius: 16px;
+  font-size: 16px; background: rgba(255, 255, 255, 0.8); color: #1b5e20;
+  outline: none; cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234caf50' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center;
+}
+
+.form-select:focus { border-color: #4caf50; }
+
+.form-textarea {
+  width: 100%; min-height: 120px; padding: 14px 20px;
+  border: 2px solid #c8e6c9; border-radius: 16px;
+  font-size: 16px; background: rgba(255, 255, 255, 0.8); color: #1b5e20;
+  outline: none; resize: vertical; font-family: inherit; line-height: 1.6;
+}
+
+.form-textarea:focus { border-color: #4caf50; box-shadow: 0 4px 20px rgba(76, 175, 80, 0.15); }
+
+.form-row { display: flex; gap: 16px; margin-bottom: 20px; }
+
+.form-row .form-group { flex: 1; }
+
+.form-input {
+  width: 100%; padding: 14px 20px;
+  border: 2px solid #c8e6c9; border-radius: 16px;
+  font-size: 16px; background: rgba(255, 255, 255, 0.8); color: #1b5e20;
+  outline: none; box-sizing: border-box;
+}
+
+.form-input:focus { border-color: #4caf50; box-shadow: 0 4px 20px rgba(76, 175, 80, 0.15); }
+
+/* 按钮 */
+.btn-primary {
+  width: 100%; height: 52px;
+  background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+  border: none; border-radius: 16px;
+  color: #ffffff; font-size: 16px; font-weight: 700; letter-spacing: 4px;
+  cursor: pointer;
+  box-shadow: 0 10px 40px rgba(76, 175, 80, 0.35);
+  transition: all 0.3s; margin-top: 8px;
+}
+
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 48px rgba(76, 175, 80, 0.45); }
+
+.btn-danger {
+  width: 100%; height: 48px;
+  background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+  border: none; border-radius: 12px;
+  color: #ffffff; font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(244, 67, 54, 0.3);
+  transition: all 0.3s;
+}
+
+.btn-danger:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(244, 67, 54, 0.4); }
+
+.btn-warning {
+  padding: 8px 16px; border: none; border-radius: 8px;
+  background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+  color: #ffffff; font-size: 13px; font-weight: 500; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(255, 167, 38, 0.3); transition: all 0.3s;
+}
+
+.btn-success {
+  padding: 8px 16px; border: none; border-radius: 8px;
+  background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%);
+  color: #ffffff; font-size: 13px; font-weight: 500; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3); transition: all 0.3s;
+}
+
+.btn-delete {
+  padding: 8px 16px; border: none; border-radius: 8px;
+  background: linear-gradient(135deg, #f44336 0%, #ef5350 100%);
+  color: #ffffff; font-size: 13px; font-weight: 500; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(244, 67, 54, 0.3); transition: all 0.3s;
+}
+
+/* 列表 */
+.list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+
+.list-item {
+  display: flex; align-items: flex-start;
+  padding: 16px 20px; background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.1);
+  gap: 16px; border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.item-left {
+  flex: 1; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+
+.tag {
+  padding: 6px 14px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+}
+
+.tag-1 { background: linear-gradient(135deg, #a5d6a7 0%, #81c784 100%); color: #1b5e20; }
+.tag-2 { background: linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%); color: #4a148c; }
+.tag-3 { background: linear-gradient(135deg, #90caf9 0%, #64b5f6 100%); color: #0d47a1; }
+.tag-4 { background: linear-gradient(135deg, #fff176 0%, #ffd54f 100%); color: #f57f17; }
+
+.q-content {
+  flex: 1; font-size: 14px; color: #2e7d32;
+  line-height: 1.6; word-break: break-all; white-space: pre-wrap; min-width: 0;
+}
+
+.student-info { display: flex; flex-direction: column; gap: 4px; }
+
+.s-name { font-size: 15px; font-weight: 600; color: #1b5e20; }
+
+.s-username { font-size: 13px; color: #4caf50; font-family: 'Courier New', monospace; }
+
+.s-status {
+  font-size: 12px; font-weight: 500; padding: 4px 12px;
+  border-radius: 6px;
+}
+
+.s-status.assigned { color: #2e7d32; background: #e8f5e9; }
+.s-status.unassigned { color: #c62828; background: #ffebee; }
+
+.list-actions { display: flex; gap: 8px; flex-shrink: 0; flex-wrap: wrap; }
+
+/* 空状态 */
+.empty-state { text-align: center; padding: 60px 40px; color: #81c784; font-size: 16px; }
+
+.empty-icon { font-size: 60px; display: block; margin-bottom: 12px; }
+
+.batch-delete-group { display: flex; flex-direction: column; gap: 12px; margin: 16px 0; }
+
+.hidden { display: none !important; }
+
+/* Toast */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  padding: 12px 24px; border-radius: 12px;
+  font-size: 14px; font-weight: 500; z-index: 1000;
+  animation: toastIn 0.3s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.toast.success { background: #e8f5e9; color: #2e7d32; border: 2px solid #a5d6a7; }
+.toast.error { background: #ffebee; color: #c62828; border: 2px solid #ef9a9a; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* 确认对话框 */
+.modal-mask {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.95); border-radius: 24px;
+  padding: 32px; max-width: 420px; width: 90%;
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.modal-title { font-size: 20px; font-weight: 700; color: #1b5e20; margin-bottom: 12px; }
+
+.modal-content p { font-size: 15px; color: #2e7d32; line-height: 1.6; margin-bottom: 24px; }
+
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
+.modal-btn {
+  padding: 10px 24px; border-radius: 10px; font-size: 14px;
+  font-weight: 600; cursor: pointer; border: none; transition: all 0.3s;
+}
+
+.modal-btn.cancel { background: #f5f5f5; color: #666; }
+.modal-btn.confirm { background: linear-gradient(135deg, #f44336 0%, #ef5350 100%); color: #fff; box-shadow: 0 4px 16px rgba(244, 67, 54, 0.3); }
+.modal-btn.confirm.green { background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3); }
+
+/* 查看题目弹窗 */
+#viewExamModal .modal-content { max-width: 640px; width: 92%; max-height: 80vh; display: flex; flex-direction: column; }
+#viewExamModal .modal-body { flex: 1; overflow-y: auto; margin-top: 16px; }
+#viewExamModal .exam-card { background: #f7f7f7; border-radius: 16px; overflow: hidden; margin-bottom: 16px; border: 1px solid #e0e0e0; }
+#viewExamModal .exam-card-head { padding: 14px 20px; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+#viewExamModal .exam-card-head.cls-1 { background: #e8f5e9; color: #1b5e20; }
+#viewExamModal .exam-card-head.cls-2 { background: #f3e5f5; color: #4a148c; }
+#viewExamModal .exam-card-head.cls-3 { background: #e3f2fd; color: #0d47a1; }
+#viewExamModal .exam-card-head.cls-4 { background: #fffde7; color: #f57f17; }
+#viewExamModal .exam-card-body { padding: 20px; font-size: 15px; color: #333; line-height: 1.8; white-space: pre-wrap; word-break: break-all; }
+#viewExamModal .empty-exams { text-align: center; padding: 40px 0; color: #aaa; font-size: 15px; }
+</style>
+</head>
+<body>
+
+<div class="bg-circle circle-1"></div>
+<div class="bg-circle circle-2"></div>
+<div class="bg-circle circle-3"></div>
+
+<!-- 登录页 -->
+<div id="loginPage" class="login-container">
+  <div class="login-card">
+    <div class="login-icon-area">
+      <div class="icon-circle"><span class="icon-emoji">🎓</span></div>
+      <span class="login-title">考试系统</span>
+      <span class="login-subtitle">管理员登录</span>
+    </div>
+    <div class="input-group">
+      <label class="input-label">管理员密钥</label>
+      <div class="input-wrapper">
+        <span class="input-icon">🔑</span>
+        <input type="password" id="adminPassword" class="input-field" placeholder="请输入管理员密钥" />
+      </div>
+    </div>
+    <button class="btn-login" onclick="doAdminLogin()">登  录</button>
+  </div>
+</div>
+
+<!-- 主界面 -->
+<div id="mainPage" class="main-container hidden">
+  <div class="top-bar">
+    <div class="title-wrapper">
+      <span class="top-icon">📚</span>
+      <div>
+        <div class="top-title">考试系统</div>
+        <div class="top-subtitle">管理员端</div>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">退出登录</button>
+  </div>
+
+  <div class="tabs-pill">
+    <button class="tab-pill active" onclick="switchTab('questions', this)">📝 题库管理</button>
+    <button class="tab-pill" onclick="switchTab('students', this)">👥 学员管理</button>
+  </div>
+
+  <!-- 题库管理 -->
+  <div id="questionsPanel">
+    <div class="stats">
+      <div class="stat-card"><div class="stat-number" id="statGushi">0</div><div class="stat-label">古诗词</div></div>
+      <div class="stat-card"><div class="stat-number" id="statWenyi">0</div><div class="stat-label">文艺稿件</div></div>
+      <div class="stat-card"><div class="stat-number" id="statXinwen">0</div><div class="stat-label">新闻播报</div></div>
+      <div class="stat-card"><div class="stat-number" id="statJixing">0</div><div class="stat-label">即兴评述</div></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header"><span class="section-icon">✏️</span><span class="section-title">添加题目</span></div>
+      <div class="form-group">
+        <label class="form-label">题目类别</label>
+        <select id="questionCategory" class="form-select">
+          <option value="古诗词">📜 古诗词</option>
+          <option value="文艺稿件">🎭 文艺稿件</option>
+          <option value="新闻播报">📰 新闻播报</option>
+          <option value="即兴评述">💡 即兴评述</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">题目内容</label>
+        <textarea id="questionContent" class="form-textarea" placeholder="请输入题目内容..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="addQuestion()">➕ 添加题目</button>
+    </div>
+
+    <div class="section-card danger-card">
+      <div class="section-header"><span class="section-icon">⚠️</span><span class="section-title">批量删除操作</span></div>
+      <div class="batch-delete-group">
+        <button class="btn-danger" onclick="deleteAllByCategory('古诗词')">🗑️ 一键删除古诗词题目</button>
+        <button class="btn-danger" onclick="deleteAllByCategory('文艺稿件')">🗑️ 一键删除文艺稿件题目</button>
+        <button class="btn-danger" onclick="deleteAllByCategory('新闻播报')">🗑️ 一键删除新闻播报题目</button>
+        <button class="btn-danger" onclick="deleteAllByCategory('即兴评述')">🗑️ 一键删除即兴评述题目</button>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header"><span class="section-icon">📋</span><span class="section-title">题库列表（<span id="questionCount">0</span> 题）</span></div>
+      <div id="questionsList" class="list">
+        <div class="empty-state"><span class="empty-icon">📭</span><span>暂无题目</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 学员管理 -->
+  <div id="studentsPanel" class="hidden">
+    <div class="section-card">
+      <div class="section-header"><span class="section-icon">➕</span><span class="section-title">添加学员</span></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">用户名</label>
+          <input type="text" id="studentUsername" class="form-input" placeholder="如 zhangsan" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <input type="password" id="studentPassword" class="form-input" placeholder="默认 123456" />
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addStudent()">➕ 添加学员</button>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header"><span class="section-icon">👥</span><span class="section-title">学员列表</span></div>
+      <div id="studentsList" class="list">
+        <div class="empty-state"><span class="empty-icon">👤</span><span>暂无学员</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 查看题目弹窗 -->
+<div id="viewExamModal" class="modal-mask hidden">
+  <div class="modal-content">
+    <div class="modal-title">📋 <span id="viewStudentName"></span> 的已分配题目</div>
+    <div id="viewExamBody" class="modal-body"></div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="modal-btn cancel" onclick="closeViewExamModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 配置（与小程序 app.js 完全一致）=====
+const SUPABASE_URL = 'https://pifhmjjwyqpzqsmutcib.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpZmhtamp3eXFwenFzbXV0Y2liIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMDMyMzYsImV4cCI6MjA5MDc3OTIzNn0.tjPOVKoQN7fJuwFRAynxumYpImy26IZlvnnLEpw336w';
+const ADMIN_PASSWORD = 'admin123';
+
+// ===== Supabase REST API 封装（与小程序 app.js sbRequest 对齐）=====
+async function sbRequest(method, table, options = {}) {
+  const { select, filter, order, limit, data, onConflict } = options;
+  let url = `${SUPABASE_URL}/rest/v1/${table}`;
+  const params = [];
+
+  if (select) params.push(`select=${encodeURIComponent(select)}`);
+  if (limit) params.push(`limit=${limit}`);
+  if (order) {
+    const [col, asc] = order.split('.');
+    params.push(`order=${col}.${asc || 'asc'}`);
+  }
+
+  // filter: [{col, val}]
+  if (filter) {
+    filter.forEach(f => {
+      params.push(`${f.col}=eq.${encodeURIComponent(f.val)}`);
+    });
+  }
+
+  if (params.length) url += '?' + params.join('&');
+  url += (url.includes('?') ? '&' : '?') + 'apikey=' + SUPABASE_KEY;
+
+  const header = {
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+  if (onConflict) header['Prefer'] += ',resolution=merge-duplicates';
+
+  const init = {
+    method,
+    headers: header
+  };
+  if (data) init.body = JSON.stringify(data);
+
+  const res = await fetch(url, init);
+  const json = await res.json();
+  return { data: json, error: res.ok ? null : json };
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+function showConfirm(title, content, onConfirm, confirmGreen = false) {
+  const mask = document.createElement('div');
+  mask.className = 'modal-mask';
+  mask.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-title">${title}</div>
+      <p>${content}</p>
+      <div class="modal-actions">
+        <button class="modal-btn cancel">取消</button>
+        <button class="modal-btn confirm ${confirmGreen ? 'green' : ''}">确认</button>
+      </div>
+    </div>`;
+  mask.querySelector('.cancel').onclick = () => mask.remove();
+  mask.querySelector('.confirm').onclick = () => { mask.remove(); onConfirm(); };
+  document.body.appendChild(mask);
+}
+
+// ===== 登录 =====
+function doAdminLogin() {
+  const pwd = document.getElementById('adminPassword').value;
+  if (pwd !== ADMIN_PASSWORD) { showToast('密钥错误', 'error'); return; }
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('mainPage').classList.remove('hidden');
+  loadQuestions();
+  loadStudents();
+}
+
+function doLogout() {
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('mainPage').classList.add('hidden');
+  document.getElementById('adminPassword').value = '';
+}
+
+// ===== 标签页 =====
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('questionsPanel').classList.toggle('hidden', tab !== 'questions');
+  document.getElementById('studentsPanel').classList.toggle('hidden', tab !== 'students');
+}
+
+// ===== 题库管理 =====
+async function loadQuestions() {
+  const { data, error } = await sbRequest('GET', 'questions', {
+    select: '*',
+    order: 'created_at.desc'
+  });
+  if (error) { showToast('加载题目失败', 'error'); return; }
+
+  const counts = { '古诗词': 0, '文艺稿件': 0, '新闻播报': 0, '即兴评述': 0 };
+  (data || []).forEach(q => { counts[q.category] = (counts[q.category] || 0) + 1; });
+
+  document.getElementById('statGushi').textContent = counts['古诗词'];
+  document.getElementById('statWenyi').textContent = counts['文艺稿件'];
+  document.getElementById('statXinwen').textContent = counts['新闻播报'];
+  document.getElementById('statJixing').textContent = counts['即兴评述'];
+  document.getElementById('questionCount').textContent = (data || []).length;
+
+  const list = document.getElementById('questionsList');
+  if (!data || !data.length) {
+    list.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><span>暂无题目</span></div>';
+    return;
+  }
+
+  const tagMap = { '古诗词': 1, '文艺稿件': 2, '新闻播报': 3, '即兴评述': 4 };
+  list.innerHTML = data.map(q => `
+    <div class="list-item">
+      <div class="item-left">
+        <span class="tag tag-${tagMap[q.category] || 1}">${escapeHtml(q.category)}</span>
+        <span class="q-content">${escapeHtml(q.content)}</span>
+      </div>
+      <div class="list-actions">
+        <button class="btn-delete" onclick="deleteQuestion('${q.id}')">删除</button>
+      </div>
+    </div>`).join('');
+}
+
+async function addQuestion() {
+  const category = document.getElementById('questionCategory').value;
+  const content = document.getElementById('questionContent').value.trim();
+  if (!content) { showToast('请输入题目内容', 'error'); return; }
+
+  const { error } = await sbRequest('POST', 'questions', { data: { category, content } });
+  if (error) { showToast('添加失败: ' + (error.message || JSON.stringify(error)), 'error'); return; }
+
+  showToast('添加成功');
+  document.getElementById('questionContent').value = '';
+  loadQuestions();
+}
+
+async function deleteQuestion(id) {
+  showConfirm('确认删除', '确定要删除这道题目吗？', async () => {
+    await sbRequest('DELETE', 'questions', { filter: [{ col: 'id', val: id }] });
+    showToast('已删除');
+    loadQuestions();
+  });
+}
+
+async function deleteAllByCategory(category) {
+  showConfirm('⚠️ 危险操作', `确定要删除所有「${category}」题目吗？此操作不可恢复！`, async () => {
+    const { error } = await sbRequest('DELETE', 'questions', { filter: [{ col: 'category', val: category }] });
+    if (error) { showToast('删除失败', 'error'); return; }
+    showToast(`已删除所有${category}题目`);
+    loadQuestions();
+  });
+}
+
+// ===== 学员管理 =====
+async function loadStudents() {
+  const [{ data: students }, { data: exams }] = await Promise.all([
+    sbRequest('GET', 'students', { select: '*', order: 'created_at.desc' }),
+    sbRequest('GET', 'exam_sets', { select: 'student_id' })
+  ]);
+
+  const examSet = new Set((exams || []).map(e => e.student_id));
+  const list = document.getElementById('studentsList');
+
+  if (!students || !students.length) {
+    list.innerHTML = '<div class="empty-state"><span class="empty-icon">👤</span><span>暂无学员</span></div>';
+    return;
+  }
+
+  list.innerHTML = students.map(s => {
+    const assigned = examSet.has(s.id);
+    return `<div class="list-item">
+      <div class="item-left">
+        <div class="student-info">
+          <span class="s-name">${escapeHtml(s.name || s.username)}</span>
+          <span class="s-username">@${escapeHtml(s.username)}</span>
+        </div>
+        <span class="s-status ${assigned ? 'assigned' : 'unassigned'}">
+          ${assigned ? '✓ 已分配' : '✗ 未分配'}
+        </span>
+      </div>
+      <div class="list-actions">
+        ${assigned
+          ? `<button class="btn-success" style="background:linear-gradient(135deg,#66bb6a,#4caf50);color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;box-shadow:0 4px 16px rgba(76,175,80,0.3)" onclick="viewStudentExams('${s.id}','${(s.name || s.username || '').replace(/'/g, "\\'")}')">📋 查看</button><button class="btn-warning" onclick="reassignExam('${s.id}')">🔄 更换</button><button class="btn-warning" style="background:linear-gradient(135deg,#bdbdbd,#9e9e9e);box-shadow:0 4px 16px rgba(0,0,0,0.15)" onclick="cancelExam('${s.id}')">✖ 取消分配</button>`
+          : `<button class="btn-success" onclick="assignExam('${s.id}')">📋 分配</button>`
+        }
+        <button class="btn-delete" onclick="deleteStudent('${s.id}')">删除</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function addStudent() {
+  const username = document.getElementById('studentUsername').value.trim();
+  const password = document.getElementById('studentPassword').value.trim() || '123456';
+  if (!username) { showToast('请输入用户名', 'error'); return; }
+
+  const { error } = await sbRequest('POST', 'students', {
+    data: { username, name: username, password }
+  });
+  if (error) { showToast('添加失败: ' + (error.message || JSON.stringify(error)), 'error'); return; }
+
+  showToast('添加成功');
+  document.getElementById('studentUsername').value = '';
+  document.getElementById('studentPassword').value = '';
+  loadStudents();
+}
+
+async function deleteStudent(id) {
+  showConfirm('确认删除', '确定要删除这个学员吗？关联的考题也会一并删除。', async () => {
+    await sbRequest('DELETE', 'exam_sets', { filter: [{ col: 'student_id', val: id }] });
+    await sbRequest('DELETE', 'students', { filter: [{ col: 'id', val: id }] });
+    showToast('已删除');
+    loadStudents();
+  });
+}
+
+async function assignExam(studentId) {
+  const categories = ['古诗词', '文艺稿件', '新闻播报', '即兴评述'];
+  for (const cat of categories) {
+    const { data: qs } = await sbRequest('GET', 'questions', {
+      select: 'id', filter: [{ col: 'category', val: cat }]
+    });
+    if (!qs || !qs.length) { showToast(cat + '题库为空', 'error'); return; }
+    const rand = qs[Math.floor(Math.random() * qs.length)];
+    await sbRequest('POST', 'exam_sets', {
+      data: { student_id: studentId, question_id: rand.id, category: cat }
+    });
+  }
+  showToast('分配成功');
+  loadStudents();
+}
+
+async function reassignExam(studentId) {
+  const categories = ['古诗词', '文艺稿件', '新闻播报', '即兴评述'];
+  for (const cat of categories) {
+    const { data: qs } = await sbRequest('GET', 'questions', {
+      select: 'id', filter: [{ col: 'category', val: cat }]
+    });
+    if (!qs || !qs.length) continue;
+    const rand = qs[Math.floor(Math.random() * qs.length)];
+    await sbRequest('PATCH', 'exam_sets', {
+      data: { question_id: rand.id },
+      filter: [{ col: 'student_id', val: studentId }, { col: 'category', val: cat }]
+    });
+  }
+  showToast('已更新');
+  loadStudents();
+}
+
+// ===== 查看已分配题目 =====
+async function viewStudentExams(studentId, studentName) {
+  document.getElementById('viewStudentName').textContent = studentName || '';
+  const body = document.getElementById('viewExamBody');
+  body.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa">加载中...</div>';
+  document.getElementById('viewExamModal').classList.remove('hidden');
+
+  const { data: examSets, error } = await sbRequest('GET', 'exam_sets', {
+    select: 'question_id,category',
+    filter: [{ col: 'student_id', val: studentId }]
+  });
+  if (error || !examSets || !examSets.length) {
+    body.innerHTML = '<div class="empty-exams">暂无已分配题目</div>';
+    return;
+  }
+
+  const tagMap = { '古诗词': 1, '文艺稿件': 2, '新闻播报': 3, '即兴评述': 4 };
+  const iconMap = { '古诗词': '📜', '文艺稿件': '🎭', '新闻播报': '📰', '即兴评述': '💡' };
+  let html = '';
+  for (const ex of examSets) {
+    const { data: q } = await sbRequest('GET', 'questions', {
+      select: 'content',
+      filter: [{ col: 'id', val: ex.question_id }],
+      limit: 1
+    });
+    const content = q && q[0] ? q[0].content : '（题目已删除）';
+    const cls = tagMap[ex.category] || 1;
+    html += `
+      <div class="exam-card">
+        <div class="exam-card-head cls-${cls}">
+          <span>${iconMap[ex.category] || '📝'}</span>
+          <span>${escapeHtml(ex.category)}</span>
+        </div>
+        <div class="exam-card-body">${escapeHtml(content)}</div>
+      </div>`;
+  }
+  body.innerHTML = html;
+}
+
+function closeViewExamModal() {
+  document.getElementById('viewExamModal').classList.add('hidden');
+}
+
+// ===== 取消分配 =====
+function cancelExam(studentId) {
+  showConfirm('取消分配', '确定要取消该学员的所有已分配题目吗？', async () => {
+    await sbRequest('DELETE', 'exam_sets', { filter: [{ col: 'student_id', val: studentId }] });
+    showToast('已取消分配');
+    loadStudents();
+  });
+}
+
+// ===== 回车登录 =====
+document.getElementById('adminPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAdminLogin();
+});
+</script>
+</body>
+</html>
+
