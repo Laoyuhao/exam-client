@@ -849,8 +849,16 @@ function cancelExam(studentId) {
 // ===== 一键取消全部分配 =====
 async function cancelAllExams() {
   showConfirm('⚠️ 危险操作', '确定要取消【所有学员】的已分配题目吗？此操作不可恢复！', async () => {
-    const { error } = await sbRequest('DELETE', 'exam_sets', {});
-    if (error) { showToast('操作失败', 'error'); return; }
+    const url = `${SUPABASE_URL}/rest/v1/exam_sets?id=not.is.null&apikey=${SUPABASE_KEY}`;
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: { 'Prefer': 'return=representation' }
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      showToast('操作失败: ' + (err.message || JSON.stringify(err)), 'error');
+      return;
+    }
     showToast('已取消全部分配');
     loadStudents();
   });
